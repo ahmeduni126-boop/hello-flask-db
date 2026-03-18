@@ -3,7 +3,7 @@ import psycopg2
 from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
-DATABASE_URL = os.getenv("DATABASE_URL","postgresql://ahmed:KGVZ993ik5EQMpIMAWbmpvh9XZuyX0xI@dpg-d6t8rhq4d50c73c5c7sg-a.oregon-postgres.render.com/hello_cloud3_db_5dbw")
+DATABASE_URL = os.getenv("postgresql://ahmed:KGVZ993ik5EQMpIMAWbmpvh9XZuyX0xI@dpg-d6t8rhq4d50c73c5c7sg-a/hello_cloud3_db_5dbw")
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
