@@ -3,7 +3,9 @@ import psycopg2
 from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
-DATABASE_URL = os.getenv("postgresql://ahmed:KGVZ993ik5EQMpIMAWbmpvh9XZuyX0xI@dpg-d6t8rhq4d50c73c5c7sg-a/hello_cloud3_db_5dbw")
+
+# ✅ Doğru kullanım
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
@@ -11,7 +13,12 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS ziyaretciler (id SERIAL PRIMARY KEY, isim TEXT NOT NULL);")
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS ziyaretciler (
+            id SERIAL PRIMARY KEY,
+            isim TEXT NOT NULL
+        );
+    """)
     conn.commit()
     cur.close()
     conn.close()
@@ -48,19 +55,24 @@ HTML_SABLON = """
 def index():
     conn = get_db_connection()
     cur = conn.cursor()
+
     if request.method == "POST":
         gelen_isim = request.form.get("isim")
         if gelen_isim:
             cur.execute("INSERT INTO ziyaretciler (isim) VALUES (%s)", (gelen_isim,))
             conn.commit()
+
     cur.execute("SELECT isim FROM ziyaretciler ORDER BY id DESC LIMIT 5")
     isimler = [row[0] for row in cur.fetchall()]
+
     cur.close()
     conn.close()
+
     return render_template_string(HTML_SABLON, isimler=isimler)
 
+
+# ✅ Render için gerekli
 if __name__ == "__main__":
     init_db()
-    import os
-    port = int(os.environ.get("PORT",5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
